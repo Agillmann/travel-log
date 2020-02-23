@@ -1,0 +1,37 @@
+version: '3'
+services:
+  web:
+    build: nginx/.
+    restart: always 
+    ports:
+    - 8080:80
+    depends_on: 
+    - script
+    - database
+  script:
+    build: .
+    restart: always 
+    depends_on: 
+    - database
+    environment: 
+    - NODE_ENV=development
+    - PORT=1337
+    - DATABASE_URI=mongodb://bomzie:gigi@mongo:27017/test
+    - DATABASE_USER=bomzie
+    - DATABASE_PASSWORD=gigi
+    - CORS_ORIGIN=http://localhost:3000
+    - API_KEY=keyboardcat
+  database:
+    image: "mongo" 
+    container_name: "mongo"
+    environment: 
+    - MONGO_INITDB_DATABASE=test
+    - MONGO_INITDB_ROOT_USERNAME=bomzie
+    - MONGO_INITDB_ROOT_PASSWORD=gigi
+    volumes:
+    - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    - mongo-volume:/data/db
+    ports:
+    - 27017:27017
+volumes:
+  "mongo-volume": {}
